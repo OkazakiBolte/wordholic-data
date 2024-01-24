@@ -1,0 +1,12 @@
+
+# Exclude all
+*
+
+# Include
+!*/
+!.gitignore
+!*.md
+!*.csv
+!*.py
+
+# exclude again
