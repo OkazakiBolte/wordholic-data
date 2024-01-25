@@ -18,6 +18,7 @@ def wordholic( df, FrontText_colunm, BackText_column, Comment=None, FrontTextLan
 
 
 class countries:
+
     # 引数 by によって指定された列の、上位 uppper の割合に含まれるデータを抜き出して返す
     def tirm_upper( df, upper=0.70, by="Population" ):
         first_column = df.columns[0]
@@ -31,8 +32,9 @@ class countries:
 
 
 def main():
-    df = pd.read_csv( "../materials/world-data-2023.csv" )
-    df = countries.tirm_upper( df, upper=0.70, by="Population" )
+    df = pd.read_csv( "../data/countries.csv", thousands="," )
+    df = countries.tirm_upper( df, upper=1, by="Capital/Major City" )
+    # df = df.sort_values( by="Capital/Major City", ascending=False )
     df = wordholic( df=df, FrontText_colunm="Country", BackText_column="Capital/Major City" )
     df.to_csv( "../outputs/countries_and_capitals.csv", index=False )
 
