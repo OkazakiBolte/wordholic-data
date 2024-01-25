@@ -1,5 +1,7 @@
 import pandas as pd
 import math
+from googletrans import Translator
+import time
 
 import utils
 
@@ -30,6 +32,23 @@ class countries:
 
         return df
 
+def translate_and_overwrite( csv ):
+    df = pd.read_csv( csv )
+    translator = Translator()
+    df[ "国名" ] = ""
+    df[ "首都" ] = ""
+
+    for i in df.index:
+        country_name_en = utils.getvalue( df, i, "Country" )
+        capital_name_en = utils.getvalue( df, i, "Capital/Major City" )
+        country_name_jp = translator.translate( country_name_en, dest="ja" ).text
+        capital_name_jp = translator.translate( capital_name_en, dest="ja" ).text
+        print( country_name_jp, capital_name_jp )
+        utils.overwrite( df, i, "国名", country_name_jp )
+        utils.overwrite( df, i, "首都", capital_name_jp )
+        time.sleep(1)
+
+    df.to_csv( csv, index=False )
 
 def main():
     df = pd.read_csv( "../data/countries.csv", thousands="," )
@@ -41,4 +60,5 @@ def main():
 
 
 if __name__=="__main__":
-    main()
+    # main()
+    translate_and_overwrite( "../data/countries.csv" )

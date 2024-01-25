@@ -10,3 +10,4 @@
 !*.py
 
 # exclude again
+tmp.csv
