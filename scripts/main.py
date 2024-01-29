@@ -117,11 +117,11 @@ def main():
     df = pd.read_csv( "../data/countries.csv", thousands="," )
     df = countries.tirm_upper( df, upper=0.6, by="Population" )
     # df = df.sort_values( by="Capital/Major City", ascending=False )
-    df = wordholic( df=df, FrontText_colunm="Country", BackText_column="Capital/Major City" )
+    df = wordholic( df=df, FrontText_colunm="国名 (Country)", BackText_column="首都 (Capital)" )
     df.to_csv( "../outputs/countries_and_capitals_upper_60%.csv", index=False )
 
 
 
 if __name__=="__main__":
-    # main()
-    countries.japanese_and_english_name( csv="../data/countries.csv" )
+    main()
+    # countries.japanese_and_english_name( csv="../data/countries.csv" )
