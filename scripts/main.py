@@ -98,17 +98,30 @@ class countries:
         df.to_csv( "../data/countries.csv", index=False )
 
 
+    def japanese_and_english_name( csv="../data/countries.csv" ):
+        df = pd.read_csv( csv )
+        df[ "国名 (Country)" ] = ""
+        df[ "首都 (Capital)" ] = ""
+        for i in df.index:
+            country_jp = utils.getvalue( df, i, "国名" )
+            capital_jp = utils.getvalue( df, i, "首都" )
+            country_en = utils.getvalue( df, i, "Country" )
+            capital_en = utils.getvalue( df, i, "Capital/Major City" )
+            utils.overwrite( df, i, "国名 (Country)", f"{country_jp} ({country_en})" )
+            utils.overwrite( df, i, "首都 (Capital)", f"{capital_jp} ({capital_en})" )
+        df.to_csv(csv, index=False )
+
+
 
 def main():
     df = pd.read_csv( "../data/countries.csv", thousands="," )
-    df = countries.tirm_upper( df, upper=1, by="Capital/Major City" )
+    df = countries.tirm_upper( df, upper=0.6, by="Population" )
     # df = df.sort_values( by="Capital/Major City", ascending=False )
     df = wordholic( df=df, FrontText_colunm="Country", BackText_column="Capital/Major City" )
-    df.to_csv( "../outputs/countries_and_capitals.csv", index=False )
+    df.to_csv( "../outputs/countries_and_capitals_upper_60%.csv", index=False )
 
 
 
 if __name__=="__main__":
     # main()
-    # countries.translate_and_overwrite( "../data/countries.csv" )
-    countries.check_japanese_name()
+    countries.japanese_and_english_name( csv="../data/countries.csv" )
