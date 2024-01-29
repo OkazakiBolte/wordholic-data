@@ -32,23 +32,72 @@ class countries:
 
         return df
 
-def translate_and_overwrite( csv ):
-    df = pd.read_csv( csv )
-    translator = Translator()
-    df[ "国名" ] = ""
-    df[ "首都" ] = ""
+    def translate_and_overwrite( csv ):
+        df = pd.read_csv( csv )
+        translator = Translator()
+        df[ "国名" ] = ""
+        df[ "首都" ] = ""
 
-    for i in df.index:
-        country_name_en = utils.getvalue( df, i, "Country" )
-        capital_name_en = utils.getvalue( df, i, "Capital/Major City" )
-        country_name_jp = translator.translate( country_name_en, dest="ja" ).text
-        capital_name_jp = translator.translate( capital_name_en, dest="ja" ).text
-        print( country_name_jp, capital_name_jp )
-        utils.overwrite( df, i, "国名", country_name_jp )
-        utils.overwrite( df, i, "首都", capital_name_jp )
-        time.sleep(1)
+        for i in df.index:
+            country_name_en = utils.getvalue( df, i, "Country" )
+            capital_name_en = utils.getvalue( df, i, "Capital/Major City" )
+            country_name_jp = translator.translate( country_name_en, dest="ja" ).text
+            capital_name_jp = translator.translate( capital_name_en, dest="ja" ).text
+            print( country_name_jp, capital_name_jp )
+            utils.overwrite( df, i, "国名", country_name_jp )
+            utils.overwrite( df, i, "首都", capital_name_jp )
+            time.sleep(1)
 
-    df.to_csv( csv, index=False )
+        df.to_csv( csv, index=False )
+
+
+    def check_japanese_name():
+        # https://note.com/kentoide/n/n16354c4b3458 こちらから日本語の国名と首都のデータを拝借
+        # 機械翻訳したもののうち、こちらにないものを手直ししていく
+        df_correct = pd.read_csv( "../data/capital_cities_2022_0.csv" )
+
+        df = pd.read_csv( "../data/countries.csv" )
+
+        print( "国名" )
+        for i in df.index:
+            name_jp = utils.getvalue( df, i, "国名" )
+            if name_jp not in df_correct[ "国名" ].tolist():
+                # 日本語名で一致しているものがなければ、英語名で一致しているものの日本語で置き換える
+                found = False
+                name_en = utils.getvalue( df, i, "Country" )
+                for j in df_correct.index:
+                    name_en_correct = utils.getvalue( df_correct, j, "Country" )
+                    name_jp_correct = utils.getvalue( df_correct, j, "国名" )
+                    if name_en==name_en_correct:
+                        # print( f"Replacing {name_jp} -> {name_jp_correct}" )
+                        utils.overwrite( df, i, "国名", new_value=name_jp_correct )
+                        found = True
+
+                if not found:
+                    print( f"Not found: { name_en }, { name_jp }" )
+
+        # 同様の置き換えを首都についても行う
+        print( "首都" )
+        for i in df.index:
+            name_jp = utils.getvalue( df, i, "首都" )
+            if name_jp not in df_correct[ "首都" ].tolist():
+                # 日本語名で一致しているものがなければ、英語名で一致しているものの日本語で置き換える
+                found = False
+                name_en = utils.getvalue( df, i, "Capital/Major City" )
+                for j in df_correct.index:
+                    name_en_correct = utils.getvalue( df_correct, j, "Capital" )
+                    name_jp_correct = utils.getvalue( df_correct, j, "首都" )
+                    if name_en==name_en_correct:
+                        # print( f"Replacing {name_jp} -> {name_jp_correct}" )
+                        utils.overwrite( df, i, "首都", new_value=name_jp_correct )
+                        found = True
+
+                if not found:
+                    print( f"Not found: { name_en }, { name_jp }" )
+
+        df.to_csv( "../data/countries.csv", index=False )
+
+
 
 def main():
     df = pd.read_csv( "../data/countries.csv", thousands="," )
@@ -61,4 +110,5 @@ def main():
 
 if __name__=="__main__":
     # main()
-    translate_and_overwrite( "../data/countries.csv" )
+    # countries.translate_and_overwrite( "../data/countries.csv" )
+    countries.check_japanese_name()
