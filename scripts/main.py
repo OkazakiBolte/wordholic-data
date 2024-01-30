@@ -3,6 +3,7 @@ import math
 from googletrans import Translator
 import time
 
+
 import utils
 
 
@@ -31,6 +32,19 @@ class countries:
         df = df.reset_index( drop=True )
 
         return df
+
+    #
+    def sorted_data_within_range(df, sort_column, start_index, end_index, ascending=True):
+        # データフレームを指定されたカラムでソート
+        df_sorted = df.sort_values(by=sort_column, ascending=ascending)
+
+        print( df_sorted[ [ "国名", "Population" ] ].to_string() )
+
+        # 指定された範囲のデータを取得
+        selected_data = df_sorted.iloc[start_index:end_index+1]
+        selected_data = selected_data.reset_index( drop=True )
+
+        return selected_data
 
     def translate_and_overwrite( csv ):
         df = pd.read_csv( csv )
@@ -114,14 +128,22 @@ class countries:
 
 
 def main():
-    df = pd.read_csv( "../data/countries.csv", thousands="," )
-    df = countries.tirm_upper( df, upper=0.6, by="Population" )
-    # df = df.sort_values( by="Capital/Major City", ascending=False )
-    df = wordholic( df=df, FrontText_colunm="国名 (Country)", BackText_column="首都 (Capital)" )
-    df.to_csv( "../outputs/countries_and_capitals_upper_60%.csv", index=False )
+
+
+    delta = 20
+    for i in range( 1, 10+1, 1 ):
+        df = pd.read_csv( "../data/countries.csv", thousands="," )
+
+        end = i * delta - 1
+        start = end - delta + 1
+        df = countries.sorted_data_within_range( df, sort_column="Population",
+                                            start_index=start, end_index=end, ascending=False)
+        df = wordholic( df=df, FrontText_colunm="国名", BackText_column="首都", FrontTextLanguage="jp-JP", BackTextLanguage="jp-JP" )
+        df.to_csv( f"../outputs/国名-首都_{start}-{end}_by-Population.csv", index=False )
 
 
 
 if __name__=="__main__":
     main()
+
     # countries.japanese_and_english_name( csv="../data/countries.csv" )
